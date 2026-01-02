@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waiting Time Estimator</title>
+
+    <!-- ============================================ -->
+    <!-- CSS STYLING -->
+    <!-- ============================================ -->
+    <style>
+        /* ---------- BASIC SETUP ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* ---------- MAIN CONTAINER ---------- */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* ---------- BACK BUTTON ---------- */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: #00b894;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+        }
+
+        /* ---------- MAIN CARD ---------- */
+        .main-card {
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ---------- HEADER ---------- */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+
+        /* ---------- INFO BOX ---------- */
+        .info-box {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-left: 5px solid #2e7d32;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .info-box h3 {
+            color: #1b5e20;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .info-box p {
+            color: #2e7d32;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .formula-display {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            font-family: monospace;
+            font-size: 16px;
+            color: #1b5e20;
+            border: 2px dashed #81c784;
+        }
+
+        /* ---------- URGENCY INFO ---------- */
+        .urgency-info {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .urgency-item {
+            text-align: center;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .urgency-normal {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .urgency-urgent {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .urgency-emergency {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* ---------- FORM SECTION ---------- */
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-title {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        /* ---------- INPUT GROUP ---------- */
+        .input-group {
+            margin-bottom: 25px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .input-group .helper {
+            font-size: 13px;
+            color: #95a5a6;
+            margin-bottom: 10px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #bdc3c7;
+            border-radius: 10px;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: #27ae60;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.2);
+        }
+
+        .input-group select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #bdc3c7;
+            border-radius: 10px;
+            font-size: 18px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .input-group select:focus {
+            border-color: #27ae60;
+            outline: none;
+        }
+
+        /* ---------- SUBMIT BUTTON ---------- */
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.5);
+        }
+
+        /* ---------- RESULT SECTION ---------- */
+        .result-section {
+            display: none;
+            margin-top: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .result-title {
+            text-align: center;
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        /* ---------- TIME DISPLAY ---------- */
+        .time-display {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .time-circle {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            box-shadow: 0 10px 30px rgba(39, 174, 96, 0.4);
+        }
+
+        .time-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: white;
+            line-height: 1.2;
+        }
+
+        .time-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* ---------- WAIT CATEGORY BADGE ---------- */
+        .wait-badge {
+            display: inline-block;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .wait-short {
+            background: linear-gradient(135deg, #26de81 0%, #20bf6b 100%);
+            color: white;
+        }
+
+        .wait-moderate {
+            background: linear-gradient(135deg, #feca57 0%, #ff9f43 100%);
+            color: white;
+        }
+
+        .wait-long {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: white;
+        }
+
+        .wait-very-long {
+            background: linear-gradient(135deg, #636e72 0%, #2d3436 100%);
+            color: white;
+        }
+
+        /* ---------- QUEUE VISUALIZATION ---------- */
+        .queue-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .queue-section h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .queue-visual {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            min-height: 80px;
+            align-items: center;
+        }
+
+        .queue-person {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            background: #3498db;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .queue-person.you {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            width: 50px;
+            height: 50px;
+            font-size: 11px;
+        }
+
+        .queue-dots {
+            font-size: 20px;
+            color: #95a5a6;
+        }
+
+        /* ---------- DETAILS BOX ---------- */
+        .details-box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .details-box h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-row .label {
+            color: #7f8c8d;
+        }
+
+        .detail-row .value {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        /* ---------- TIP BOX ---------- */
+        .tip-box {
+            background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .tip-box .icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .tip-box p {
+            color: #827717;
+            font-size: 15px;
+        }
+
+        /* ---------- ERROR MESSAGE ---------- */
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- ============================================ -->
+        <!-- BACK BUTTON -->
+        <!-- ============================================ -->
+        <a href="index.html" class="back-btn">
+            ← Back to Dashboard
+        </a>
+
+        <!-- ============================================ -->
+        <!-- MAIN CARD -->
+        <!-- ============================================ -->
+        <div class="main-card">
+
+            <!-- ============================================ -->
+            <!-- HEADER -->
+            <!-- ============================================ -->
+            <div class="header">
+                <div class="header-icon">⏱️</div>
+                <h1>Waiting Time Estimator</h1>
+                <p>Find out how long you might wait at the hospital</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- INFO BOX -->
+            <!-- ============================================ -->
+            <div class="info-box">
+                <h3>📊 How Wait Time is Calculated</h3>
+                <p>
+                    We estimate waiting time based on how many patients are ahead of you.
+                    On average, each patient takes about 7 minutes.
+                </p>
+                <div class="formula-display">
+                    Wait Time = Patients Ahead × 7 minutes
+                </div>
+
+                <div class="urgency-info">
+                    <div class="urgency-item urgency-normal">
+                        <strong>Normal</strong><br>
+                        Full wait time
+                    </div>
+                    <div class="urgency-item urgency-urgent">
+                        <strong>Urgent</strong><br>
+                        Half wait time
+                    </div>
+                    <div class="urgency-item urgency-emergency">
+                        <strong>Emergency</strong><br>
+                        ~5 min (priority)
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- INPUT FORM -->
+            <!-- ============================================ -->
+            <form id="waitForm" class="form-section">
+                <h3 class="form-title">📝 Enter Queue Information</h3>
+
+                <!-- Patients in Queue -->
+                <div class="input-group">
+                    <label for="patientsInQueue">👥 Patients Ahead of You</label>
+                    <p class="helper">How many patients are currently waiting before you?</p>
+                    <input type="number" id="patientsInQueue" min="0" max="100" placeholder="Enter number (e.g., 5)"
+                        required>
+                </div>
+
+                <!-- Urgency Level -->
+                <div class="input-group">
+                    <label for="urgencyLevel">🚨 Your Urgency Level</label>
+                    <p class="helper">Select based on how urgent your visit is</p>
+                    <select id="urgencyLevel">
+                        <option value="normal">😊 Normal - Regular checkup or consultation</option>
+                        <option value="urgent">😟 Urgent - Need attention soon (not life-threatening)</option>
+                        <option value="emergency">🚨 Emergency - Life-threatening situation</option>
+                    </select>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn">
+                    ⏳ Estimate Wait Time
+                </button>
+            </form>
+
+            <!-- ============================================ -->
+            <!-- ERROR MESSAGE -->
+            <!-- ============================================ -->
+            <div id="errorBox" class="error-message">
+                ⚠️ Could not connect to server. Make sure Python API is running on port 8003!
+            </div>
+
+            <!-- ============================================ -->
+            <!-- RESULT SECTION -->
+            <!-- ============================================ -->
+            <div id="resultSection" class="result-section">
+                <div class="result-card">
+                    <h3 class="result-title">⏱️ Estimated Wait Time</h3>
+
+                    <!-- Time Display -->
+                    <div class="time-display">
+                        <div class="time-circle">
+                            <span id="timeNumber" class="time-number">-</span>
+                            <span class="time-label">Estimated Wait</span>
+                        </div>
+                        <span id="waitBadge" class="wait-badge">-</span>
+                    </div>
+
+                    <!-- Queue Visualization -->
+                    <div class="queue-section">
+                        <h4>👥 Queue Visualization</h4>
+                        <div id="queueVisual" class="queue-visual">
+                            <!-- Queue will be rendered here -->
+                        </div>
+                        <p style="text-align: center; color: #7f8c8d; margin-top: 10px; font-size: 13px;">
+                            Blue = Patients ahead | Red = You
+                        </p>
+                    </div>
+
+                    <!-- Details Box -->
+                    <div class="details-box">
+                        <h4>📋 Details</h4>
+                        <div class="detail-row">
+                            <span class="label">Patients ahead of you:</span>
+                            <span id="detailPatients" class="value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Your urgency level:</span>
+                            <span id="detailUrgency" class="value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Average time per patient:</span>
+                            <span id="detailAvg" class="value">-</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Estimated wait (minutes):</span>
+                            <span id="detailMinutes" class="value">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Tip Box -->
+                    <div class="tip-box">
+                        <div class="icon">💡</div>
+                        <p id="tipText">-</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // GET HTML ELEMENTS
+        // ============================================
+        const form = document.getElementById('waitForm');
+        const resultSection = document.getElementById('resultSection');
+        const errorBox = document.getElementById('errorBox');
+
+        // Result elements
+        const timeNumber = document.getElementById('timeNumber');
+        const waitBadge = document.getElementById('waitBadge');
+        const queueVisual = document.getElementById('queueVisual');
+
+        // Detail elements
+        const detailPatients = document.getElementById('detailPatients');
+        const detailUrgency = document.getElementById('detailUrgency');
+        const detailAvg = document.getElementById('detailAvg');
+        const detailMinutes = document.getElementById('detailMinutes');
+        const tipText = document.getElementById('tipText');
+
+        // API URL
+        const API_URL = 'http://localhost:8003/estimate-wait';
+
+        // ============================================
+        // FORM SUBMIT HANDLER
+        // ============================================
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            // Hide previous results
+            resultSection.style.display = 'none';
+            errorBox.style.display = 'none';
+
+            // Get input values
+            const patientsInQueue = parseInt(document.getElementById('patientsInQueue').value);
+            const urgencyLevel = document.getElementById('urgencyLevel').value;
+
+            try {
+                // Send data to API
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        patients_in_queue: patientsInQueue,
+                        urgency_level: urgencyLevel
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Server error');
+                }
+
+                const result = await response.json();
+                displayResults(result);
+
+            } catch (error) {
+                console.error('Error:', error);
+                errorBox.style.display = 'block';
+            }
+        });
+
+        // ============================================
+        // DISPLAY RESULTS FUNCTION
+        // ============================================
+        function displayResults(result) {
+            // Show result section
+            resultSection.style.display = 'block';
+
+            // Display formatted time
+            timeNumber.textContent = result.formatted_wait_time;
+
+            // Display wait category badge
+            waitBadge.textContent = result.wait_category;
+            waitBadge.className = 'wait-badge';
+
+            if (result.wait_category.includes('SHORT')) {
+                waitBadge.classList.add('wait-short');
+            } else if (result.wait_category.includes('MODERATE')) {
+                waitBadge.classList.add('wait-moderate');
+            } else if (result.wait_category.includes('VERY LONG')) {
+                waitBadge.classList.add('wait-very-long');
+            } else {
+                waitBadge.classList.add('wait-long');
+            }
+
+            // Create queue visualization
+            createQueueVisualization(result.patients_ahead);
+
+            // Fill in details
+            detailPatients.textContent = result.patients_ahead + ' patient(s)';
+            detailUrgency.textContent = result.urgency_level.toUpperCase();
+            detailAvg.textContent = result.average_time_per_patient + ' minutes';
+            detailMinutes.textContent = result.estimated_wait_minutes + ' minutes';
+
+            // Display tip
+            tipText.textContent = result.tip;
+
+            // Scroll to results
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ============================================
+        // CREATE QUEUE VISUALIZATION
+        // Shows circles for each patient in queue
+        // ============================================
+        function createQueueVisualization(count) {
+            // Clear previous visualization
+            queueVisual.innerHTML = '';
+
+            // Limit to 15 for display
+            const displayCount = Math.min(count, 15);
+
+            // Create circle for each patient ahead
+            for (let i = 0; i < displayCount; i++) {
+                const person = document.createElement('div');
+                person.className = 'queue-person';
+                person.textContent = i + 1;
+                queueVisual.appendChild(person);
+            }
+
+            // If more than 15, show dots
+            if (count > 15) {
+                const dots = document.createElement('span');
+                dots.className = 'queue-dots';
+                dots.textContent = '...';
+                queueVisual.appendChild(dots);
+            }
+
+            // Add "YOU" at the end
+            const you = document.createElement('div');
+            you.className = 'queue-person you';
+            you.textContent = 'YOU';
+            queueVisual.appendChild(you);
+        }
+    </script>
+
+</body>
+
+</html>

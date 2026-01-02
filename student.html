@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Performance Predictor</title>
+
+    <!-- ============================================ -->
+    <!-- CSS STYLING - Makes the page look nice -->
+    <!-- ============================================ -->
+    <style>
+        /* ---------- BASIC SETUP ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* ---------- MAIN CONTAINER ---------- */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* ---------- BACK BUTTON ---------- */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: #0984e3;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ---------- MAIN CARD ---------- */
+        .main-card {
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ---------- HEADER ---------- */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+
+        /* ---------- INFO BOX ---------- */
+        /* Explains how the formula works */
+        .info-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 5px solid #2196f3;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .info-box h3 {
+            color: #1565c0;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .info-box p {
+            color: #1976d2;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .formula-display {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            font-family: monospace;
+            font-size: 16px;
+            color: #0d47a1;
+            border: 2px dashed #90caf9;
+        }
+
+        /* ---------- FORM SECTION ---------- */
+        .form-section {
+            margin-bottom: 30px;
+        }
+
+        .form-title {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        /* ---------- INPUT GROUP ---------- */
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .input-group .helper {
+            font-size: 13px;
+            color: #95a5a6;
+            margin-bottom: 8px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #bdc3c7;
+            border-radius: 10px;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.2);
+        }
+
+        /* ---------- INPUT SLIDER DISPLAY ---------- */
+        .slider-value {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+            margin-top: 10px;
+        }
+
+        /* ---------- RANGE INPUT (SLIDER) ---------- */
+        input[type="range"] {
+            width: 100%;
+            height: 10px;
+            border-radius: 5px;
+            background: #ecf0f1;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #3498db;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ---------- SUBMIT BUTTON ---------- */
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.5);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* ---------- RESULT SECTION ---------- */
+        .result-section {
+            display: none;
+            margin-top: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
+            border-radius: 15px;
+            padding: 30px;
+        }
+
+        .result-title {
+            text-align: center;
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        /* ---------- SCORE DISPLAY ---------- */
+        .score-display {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.4);
+        }
+
+        .score-number {
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* ---------- RISK LEVEL BOX ---------- */
+        .risk-box {
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .risk-high {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%);
+            color: white;
+        }
+
+        .risk-medium {
+            background: linear-gradient(135deg, #feca57 0%, #ff9f43 100%);
+            color: white;
+        }
+
+        .risk-low {
+            background: linear-gradient(135deg, #26de81 0%, #20bf6b 100%);
+            color: white;
+        }
+
+        /* ---------- BREAKDOWN BOX ---------- */
+        .breakdown {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .breakdown h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-item .label {
+            color: #7f8c8d;
+        }
+
+        .breakdown-item .value {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        /* ---------- TIPS BOX ---------- */
+        .tips-box {
+            margin-top: 20px;
+            background: #fff9c4;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .tips-box h4 {
+            color: #f9a825;
+            margin-bottom: 10px;
+        }
+
+        .tips-box ul {
+            margin-left: 20px;
+            color: #827717;
+        }
+
+        .tips-box li {
+            margin-bottom: 5px;
+        }
+
+        /* ---------- ERROR MESSAGE ---------- */
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        /* ---------- LOADING SPINNER ---------- */
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #ecf0f1;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- ============================================ -->
+        <!-- BACK BUTTON - Returns to home page -->
+        <!-- ============================================ -->
+        <a href="index.html" class="back-btn">
+            ← Back to Dashboard
+        </a>
+
+        <!-- ============================================ -->
+        <!-- MAIN CARD - Contains everything -->
+        <!-- ============================================ -->
+        <div class="main-card">
+
+            <!-- ============================================ -->
+            <!-- HEADER - Title and icon -->
+            <!-- ============================================ -->
+            <div class="header">
+                <div class="header-icon">📚</div>
+                <h1>Student Performance Predictor</h1>
+                <p>Predict exam scores based on study habits</p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- INFO BOX - Explains the formula -->
+            <!-- ============================================ -->
+            <div class="info-box">
+                <h3>📖 How Does This Work?</h3>
+                <p>
+                    This predictor uses a simple formula to estimate exam scores.
+                    More study hours and higher attendance generally lead to better scores!
+                </p>
+                <div class="formula-display">
+                    Score = (Study Hours × 5) + (Attendance × 0.5)
+                </div>
+                <p style="margin-top: 10px; font-size: 13px;">
+                    <strong>Example:</strong> 6 hours study + 80% attendance = (6×5) + (80×0.5) = 30 + 40 = 70%
+                </p>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- INPUT FORM - Where user enters data -->
+            <!-- ============================================ -->
+            <form id="predictForm" class="form-section">
+                <h3 class="form-title">📝 Enter Student Information</h3>
+
+                <!-- Study Hours Input -->
+                <div class="input-group">
+                    <label for="studyHours">📖 Daily Study Hours</label>
+                    <p class="helper">How many hours does the student study each day? (0-10 hours)</p>
+                    <input type="range" id="studyHours" min="0" max="10" step="0.5" value="5">
+                    <div class="slider-value"><span id="hoursDisplay">5</span> hours/day</div>
+                </div>
+
+                <!-- Attendance Input -->
+                <div class="input-group">
+                    <label for="attendance">📅 Attendance Percentage</label>
+                    <p class="helper">What percentage of classes does the student attend? (0-100%)</p>
+                    <input type="range" id="attendance" min="0" max="100" step="5" value="75">
+                    <div class="slider-value"><span id="attendanceDisplay">75</span>%</div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn">
+                    🎯 Predict Score
+                </button>
+            </form>
+
+            <!-- ============================================ -->
+            <!-- ERROR MESSAGE - Shows when API fails -->
+            <!-- ============================================ -->
+            <div id="errorBox" class="error-message">
+                ⚠️ Could not connect to server. Make sure Python API is running on port 8001!
+            </div>
+
+            <!-- ============================================ -->
+            <!-- RESULT SECTION - Shows prediction results -->
+            <!-- ============================================ -->
+            <div id="resultSection" class="result-section">
+                <div class="result-card">
+                    <h3 class="result-title">📊 Prediction Results</h3>
+
+                    <!-- Score Circle Display -->
+                    <div class="score-display">
+                        <div class="score-circle">
+                            <span id="scoreNumber" class="score-number">0</span>
+                            <span class="score-label">Predicted Score</span>
+                        </div>
+                    </div>
+
+                    <!-- Risk Level Box -->
+                    <div id="riskBox" class="risk-box">
+                        <!-- Risk level will be inserted here -->
+                    </div>
+
+                    <!-- Calculation Breakdown -->
+                    <div class="breakdown">
+                        <h4>📋 Calculation Breakdown</h4>
+                        <div class="breakdown-item">
+                            <span class="label">Study Hours Input:</span>
+                            <span id="inputHours" class="value">-</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="label">Attendance Input:</span>
+                            <span id="inputAttendance" class="value">-</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="label">Study Contribution (hours × 5):</span>
+                            <span id="studyContrib" class="value">-</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="label">Attendance Contribution (% × 0.5):</span>
+                            <span id="attendContrib" class="value">-</span>
+                        </div>
+                        <div class="breakdown-item" style="background: #e3f2fd; padding: 15px; border-radius: 8px;">
+                            <span class="label"><strong>Final Predicted Score:</strong></span>
+                            <span id="finalScore" class="value" style="color: #1565c0; font-size: 20px;">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Tips Box -->
+                    <div id="tipsBox" class="tips-box">
+                        <h4>💡 Improvement Tips</h4>
+                        <ul id="tipsList">
+                            <!-- Tips will be inserted here -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT - Makes the page interactive -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // GET HTML ELEMENTS
+        // We need references to elements we'll change
+        // ============================================
+
+        // Form elements
+        const form = document.getElementById('predictForm');
+        const studyInput = document.getElementById('studyHours');
+        const attendanceInput = document.getElementById('attendance');
+
+        // Display elements for sliders
+        const hoursDisplay = document.getElementById('hoursDisplay');
+        const attendanceDisplay = document.getElementById('attendanceDisplay');
+
+        // Result elements
+        const resultSection = document.getElementById('resultSection');
+        const scoreNumber = document.getElementById('scoreNumber');
+        const riskBox = document.getElementById('riskBox');
+        const errorBox = document.getElementById('errorBox');
+
+        // Breakdown elements
+        const inputHours = document.getElementById('inputHours');
+        const inputAttendance = document.getElementById('inputAttendance');
+        const studyContrib = document.getElementById('studyContrib');
+        const attendContrib = document.getElementById('attendContrib');
+        const finalScore = document.getElementById('finalScore');
+        const tipsList = document.getElementById('tipsList');
+
+        // API URL - This is where our Python server is running
+        const API_URL = 'http://localhost:8001/predict';
+
+        // ============================================
+        // SLIDER UPDATE FUNCTIONS
+        // These update the display when sliders move
+        // ============================================
+
+        // Update study hours display when slider changes
+        studyInput.addEventListener('input', function () {
+            hoursDisplay.textContent = this.value;
+        });
+
+        // Update attendance display when slider changes
+        attendanceInput.addEventListener('input', function () {
+            attendanceDisplay.textContent = this.value;
+        });
+
+        // ============================================
+        // FORM SUBMIT HANDLER
+        // This runs when user clicks "Predict Score"
+        // ============================================
+        form.addEventListener('submit', async function (event) {
+            // Prevent page from refreshing
+            event.preventDefault();
+
+            // Hide previous results and errors
+            resultSection.style.display = 'none';
+            errorBox.style.display = 'none';
+
+            // Get values from the sliders
+            const studyHours = parseFloat(studyInput.value);
+            const attendance = parseFloat(attendanceInput.value);
+
+            try {
+                // ============================================
+                // SEND DATA TO API
+                // We use fetch() to make an HTTP request
+                // ============================================
+                const response = await fetch(API_URL, {
+                    method: 'POST',              // We're sending data
+                    headers: {
+                        'Content-Type': 'application/json'  // Data format is JSON
+                    },
+                    body: JSON.stringify({       // Convert to JSON string
+                        study_hours: studyHours,
+                        attendance: attendance
+                    })
+                });
+
+                // Check if request was successful
+                if (!response.ok) {
+                    throw new Error('Server returned an error');
+                }
+
+                // Parse the JSON response
+                const result = await response.json();
+
+                // ============================================
+                // DISPLAY THE RESULTS
+                // Show all the prediction data on the page
+                // ============================================
+                displayResults(result, studyHours, attendance);
+
+            } catch (error) {
+                // If something went wrong, show error message
+                console.error('Error:', error);
+                errorBox.style.display = 'block';
+            }
+        });
+
+        // ============================================
+        // DISPLAY RESULTS FUNCTION
+        // This shows the prediction on the page
+        // ============================================
+        function displayResults(result, studyHours, attendance) {
+            // Show the result section
+            resultSection.style.display = 'block';
+
+            // Display the predicted score
+            scoreNumber.textContent = result.predicted_score + '%';
+
+            // Display risk level with appropriate color
+            riskBox.textContent = result.risk_level;
+
+            // Remove old risk classes
+            riskBox.classList.remove('risk-high', 'risk-medium', 'risk-low');
+
+            // Add appropriate risk class based on level
+            if (result.risk_level.includes('HIGH')) {
+                riskBox.classList.add('risk-high');
+            } else if (result.risk_level.includes('MEDIUM')) {
+                riskBox.classList.add('risk-medium');
+            } else {
+                riskBox.classList.add('risk-low');
+            }
+
+            // ============================================
+            // SHOW CALCULATION BREAKDOWN
+            // This helps students understand the math
+            // ============================================
+            inputHours.textContent = studyHours + ' hours/day';
+            inputAttendance.textContent = attendance + '%';
+
+            // Calculate contributions
+            const studyContribution = studyHours * 5;
+            const attendContribution = attendance * 0.5;
+
+            studyContrib.textContent = studyHours + ' × 5 = ' + studyContribution + ' points';
+            attendContrib.textContent = attendance + ' × 0.5 = ' + attendContribution + ' points';
+            finalScore.textContent = result.predicted_score + '%';
+
+            // ============================================
+            // GENERATE IMPROVEMENT TIPS
+            // Give helpful advice based on the inputs
+            // ============================================
+            generateTips(studyHours, attendance, result.predicted_score);
+
+            // Scroll to results
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ============================================
+        // GENERATE TIPS FUNCTION
+        // Creates helpful advice based on inputs
+        // ============================================
+        function generateTips(studyHours, attendance, score) {
+            // Clear previous tips
+            tipsList.innerHTML = '';
+
+            // Array to hold our tips
+            const tips = [];
+
+            // Add tips based on study hours
+            if (studyHours < 3) {
+                tips.push('📚 Try to increase study hours to at least 3-4 hours daily');
+            } else if (studyHours < 5) {
+                tips.push('📖 Good effort! Try adding 1-2 more study hours for better results');
+            } else {
+                tips.push('⭐ Great study routine! Keep it up!');
+            }
+
+            // Add tips based on attendance
+            if (attendance < 60) {
+                tips.push('📅 Attendance is very low! Try to attend at least 75% of classes');
+            } else if (attendance < 80) {
+                tips.push('🏫 Improve attendance to 80%+ for better understanding');
+            } else {
+                tips.push('✅ Excellent attendance! This helps a lot!');
+            }
+
+            // Add tips based on score
+            if (score < 40) {
+                tips.push('⚠️ Focus on both study hours AND attendance to improve');
+            } else if (score < 60) {
+                tips.push('💪 You are on the right track! Small improvements will help');
+            } else {
+                tips.push('🎉 Great predicted score! Maintain your routine');
+            }
+
+            // Add tips to the list
+            tips.forEach(tip => {
+                const li = document.createElement('li');
+                li.textContent = tip;
+                tipsList.appendChild(li);
+            });
+        }
+    </script>
+
+</body>
+
+</html>

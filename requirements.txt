@@ -1,0 +1,18 @@
+# ============================================
+# REQUIREMENTS FILE
+# ============================================
+# This file lists all the Python packages needed
+# to run the AI Mini Dashboard project.
+#
+# To install all packages, run this command:
+# pip install -r requirements.txt
+# ============================================
+
+# FastAPI - The framework we use to create our web APIs
+fastapi
+
+# Uvicorn - The server that runs our FastAPI applications
+uvicorn
+
+# Pydantic - For data validation (comes with FastAPI but listed for clarity)
+pydantic
